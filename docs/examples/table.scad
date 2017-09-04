@@ -1,10 +1,14 @@
-include <../../dist/laserscad.scad>
+include <laserscad.scad>
 
 thick = 5;
 top_x = 80;
 top_y = 50;
 
-ltranslate([0,0,leg_z-thick])
+leg_y = 40;
+leg_z = 30;    
+leg_pos_x = 10;
+
+ltranslate([0,0,leg_z-thick]) {
     lpart("table-top", [top_x, top_y]) {
         difference() {
             cube([top_x, top_y, thick]);
@@ -12,15 +16,12 @@ ltranslate([0,0,leg_z-thick])
             for(x=[leg_pos_x, top_x-leg_pos_x-thick]) {
                 for(y=[thick,top_y-0.25*leg_y-thick]) {
                     translate([x, y, 0])
-                        cube([thick, 0.25*leg_y-thick, thick]);
+                        cube([thick, 0.25*leg_y, thick]);
                 }
             }
         }
     }
-    
-leg_y = 40;
-leg_z = 30;    
-leg_pos_x = 10;
+}
 
 module leg(id) {
     lrotate([0,-90,0])
