@@ -19,11 +19,11 @@ def writeback(scad_path, pos_path):
 		reader = csv.reader(pos_file)
 		translations = [(name, "[{},{},0]".format(x, y)) for name, x, y in list(reader)]
 
-	_lobject_translation = "\nfunction _lobject_translation(id) = " + create_recursive_ternary_expr(translations)
+	_lpart_translation = "\nfunction _lpart_translation(id) = " + create_recursive_ternary_expr(translations)
 
 	with open(scad_path, 'a') as scad_file:
-		scad_file.write(_lobject_translation)
-		scad_file.write("\n_lasercutx_mode=2;")
+		scad_file.write(_lpart_translation)
+		scad_file.write("\n_laserscad_mode=2;")
 
 
 if __name__=="__main__":

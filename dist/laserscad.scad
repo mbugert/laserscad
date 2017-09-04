@@ -62,17 +62,13 @@ _lkerf_default = 0;
 _lmargin_default = 2;
 
 // actual lpart after sanity checks
-module _lpart_sane(id, dims) {    
+module _lpart_sane(id, dims) {   
     if (_laserscad_mode <= 0) {
         children();
     } else {
-        if (lkerf == undef) {
-            lkerf = _lkerf_default;
-        }
-        if (lmargin == undef) {
-            lmargin = _lmargin_default;
-        }
-        
+        lkerf = lkerf == undef? _lkerf_default : lkerf;
+        lmargin = lmargin == undef? _lmargin_default : lmargin;
+
         if (_laserscad_mode == 1) {
             ext_dims = dims + 2 * (lkerf + lmargin) * [1,1];
             echo(str("[laserscad] ##",id,",",ext_dims[0],",",ext_dims[1],"##"));

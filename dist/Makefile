@@ -57,5 +57,5 @@ $(SOURCE)/%_2d.scad: $(SOURCE)/%.scad $(TEMP)/%_pos.csv | $(UTIL)
 	
 $(OUTPUTS): $(TARGET)/%.dxf: $(SOURCE)/%_2d.scad | $(TARGET)
 	@echo Creating $@...
-	@openscad -o $@ -D _laserscad_mode=3 $(OVARS) $<
+	@openscad -o $@ -D _laserscad_mode=3 $(OVARS) $< 2> /dev/null
 	@echo Done.
