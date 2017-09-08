@@ -22,7 +22,7 @@ The library is best explained with an example (scroll down if you are looking fo
 
 Say we want to create this small table which consists of a table top and two legs:
 
-\<photo of final result\>
+![Small table cut from 5mm MDF](docs/tutorial_table_00.jpg)
 
 ### Creating the Model
 
