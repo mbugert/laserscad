@@ -73,7 +73,7 @@ module _lpart_sane(id, dims) {
             ext_dims = dims + 2 * (lkerf + lmargin) * [1,1];
             echo(str("[laserscad] ##",id,",",ext_dims[0],",",ext_dims[1],"##"));
         } else {
-            translate(_lpart_translation(id) + lmargin*[1,1,0]) {
+            translate(_lpart_translation(id) + (lkerf + lmargin)*[1,1,0]) {
                 // show the bounding box if in validate mode
                 if (_laserscad_mode == 2) {
                     color("magenta", 0.6)
