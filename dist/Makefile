@@ -1,5 +1,8 @@
+# one of [fastest, medium, high, insane]
+quality = medium
 sheet_xlen = 600
 sheet_ylen = 300
+object_margin = 2
 
 SOURCE = scad
 TEMP = temp
@@ -54,12 +57,12 @@ $(TEMP)/%_bb.csv: $(SOURCE)/%.scad | $(SOURCE) $(TEMP)
 # optimize object placement
 $(TEMP)/%_pos.csv: $(TEMP)/%_bb.csv | $(UTIL)
 	@echo Optimizing object placement...
-	@python3 $(UTIL)/column_packing.py $(sheet_xlen) $(sheet_ylen) $< $@
+	@python3 $(UTIL)/packing.py $< $@ $(quality) $(sheet_xlen) $(sheet_ylen) $(object_margin)
 
 # copy the source scad file, then inject the optimal translations into it
 $(SOURCE)/%_2d.scad: $(SOURCE)/%.scad $(TEMP)/%_pos.csv | $(UTIL)
 	@cp $< $@
-	@python3 $(UTIL)/writeback.py $@ $(word 2,$^)
+	@python3 $(UTIL)/write_back.py $@ $(word 2,$^)
 	
 $(OUTPUTS_DXF): $(TARGET_DXF)/%.dxf: $(SOURCE)/%_2d.scad | $(TARGET_DXF)
 	@echo Creating $@...

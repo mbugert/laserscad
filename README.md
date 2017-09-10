@@ -130,16 +130,13 @@ These parameters can be defined in the global scope of a scad file.
 #### lkerf
 Compensate laser kerf (shrinkage caused by the laser) in millimeters. *Default = 0*
 
-#### lmargin
-Distance between lparts in 2D in millimeters. *Default = 2*
-
 ### Exporting to 2D
 1. Drag your ``.scad`` source file(s) into the ``scad`` folder.
 2. Open a shell in the folder containing ``Makefile`` and run ``make``. The resulting DXF files are located in the ``dxf`` folder.
 3. *Recommended:* Open ``scad/<your-model>_2d.scad`` with OpenSCAD to verify that all ``lpart`` dimensions were defined correctly and nothing overlaps.
 
 ### Sheet Size
-There is currently no nice way of specifying the sheet size. However, it can be changed with a text editor in the ``Makefile``. The default is 600x300 (millimeters).
+There is currently no nice way of specifying the sheet size. However, it can be changed with a text editor in the ``Makefile``. The default is 600x300 (millimeters). In the same spot, the 2D object margins can be set (*Default = 2*).
 
 ## FAQ
 ### What does laserscad do?

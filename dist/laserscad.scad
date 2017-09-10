@@ -55,11 +55,11 @@ module lpart(id, dims) {
     }
 }
 
-// overwritten once optimal translations are known after packing
+// overwritten once optimal translations/rotations are known after packing
 function _lpart_translation(id) = [0,0,0];
+function _lpart_rotation(id) = [0,0,0];
 
 _lkerf_default = 0;
-_lmargin_default = 2;
 
 // actual lpart after sanity checks
 module _lpart_sane(id, dims) {   
@@ -67,21 +67,22 @@ module _lpart_sane(id, dims) {
         children();
     } else {
         lkerf = lkerf == undef? _lkerf_default : lkerf;
-        lmargin = lmargin == undef? _lmargin_default : lmargin;
 
         if (_laserscad_mode == 1) {
-            ext_dims = dims + 2 * (lkerf + lmargin) * [1,1];
+            ext_dims = dims + 2*lkerf * [1,1];
             echo(str("[laserscad] ##",id,",",ext_dims[0],",",ext_dims[1],"##"));
         } else {
-            translate(_lpart_translation(id) + (lkerf + lmargin)*[1,1,0]) {
-                // show the bounding box if in validate mode
-                if (_laserscad_mode == 2) {
-                    color("magenta", 0.6)
-                        square(dims + lkerf*[1,1]);
+            translate(_lpart_translation(id) + lkerf*[1,1,0]) {
+                rotate(_lpart_rotation(id)) {
+                    // show the bounding box if in validate mode
+                    if (_laserscad_mode == 2) {
+                        color("magenta", 0.6)
+                            square(dims + lkerf*[1,1]);
+                    }
+                    offset(delta=lkerf)
+                        projection(cut=false)
+                            children();
                 }
-                offset(delta=lkerf)
-                    projection(cut=false)
-                        children();
             }
         }
     }
@@ -93,7 +94,6 @@ module _lpart_sane(id, dims) {
 // print hints in dev mode if variables are undefined
 if (_laserscad_mode == 0) {
     _laserscad_var_sanity_check(lkerf, "lkerf", _lkerf_default);
-    _laserscad_var_sanity_check(lmargin, "lmargin", _lmargin_default);
 }
 
 module _laserscad_var_sanity_check(var, name, default) {
