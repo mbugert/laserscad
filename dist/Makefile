@@ -3,7 +3,8 @@ sheet_ylen = 300
 
 SOURCE = scad
 TEMP = temp
-TARGET = dxf
+TARGET_DXF = dxf
+TARGET_SVG = svg
 UTIL = util
 
 OVARS =
@@ -11,10 +12,11 @@ OVARS =
 # inputs are scad files in the SOURCE folder (and deeper) which contain a line containing "laserscad.scad", except laserscad.scad itself
 INPUTS = $(shell grep -irlE --include=*.scad --exclude=*_2d.scad --exclude laserscad.scad "laserscad.scad" $(SOURCE))
 
-# outputs (targets) are files of the same name as the input files, but with dxf extension
-OUTPUTS = $(patsubst $(SOURCE)/%, $(TARGET)/%, $(INPUTS:.scad=.dxf))
+# outputs (targets) are files of the same name as the input files, but with dxf/svg extension
+OUTPUTS_DXF = $(patsubst $(SOURCE)/%, $(TARGET_DXF)/%, $(INPUTS:.scad=.dxf))
+OUTPUTS_SVG = $(patsubst $(SOURCE)/%, $(TARGET_SVG)/%, $(INPUTS:.scad=.svg))
 
-all: check_requirements $(OUTPUTS)
+all: check_requirements $(OUTPUTS_DXF) $(OUTPUTS_SVG)
 
 # python3 exists?
 check_requirements:
@@ -22,7 +24,8 @@ check_requirements:
 
 clean:
 	@rm -rf $(TEMP)
-	@rm -rf $(TARGET)
+	@rm -rf $(TARGET_DXF)
+	@rm -rf $(TARGET_SVG)
 	@rm -rf $(SOURCE)/*_2d.scad
 
 .PHONY: all clean check_requirements
@@ -32,8 +35,11 @@ clean:
 $(SOURCE):
 	@mkdir $(SOURCE)
 
-$(TARGET):
-	@mkdir $(TARGET)
+$(TARGET_DXF):
+	@mkdir $(TARGET_DXF)
+
+$(TARGET_SVG):
+	@mkdir $(TARGET_SVG)
 
 $(TEMP):
 	@mkdir $(TEMP)
@@ -55,7 +61,12 @@ $(SOURCE)/%_2d.scad: $(SOURCE)/%.scad $(TEMP)/%_pos.csv | $(UTIL)
 	@cp $< $@
 	@python3 $(UTIL)/writeback.py $@ $(word 2,$^)
 	
-$(OUTPUTS): $(TARGET)/%.dxf: $(SOURCE)/%_2d.scad | $(TARGET)
+$(OUTPUTS_DXF): $(TARGET_DXF)/%.dxf: $(SOURCE)/%_2d.scad | $(TARGET_DXF)
+	@echo Creating $@...
+	@openscad -o $@ -D _laserscad_mode=3 $(OVARS) $< 2> /dev/null
+	@echo Done.
+
+$(OUTPUTS_SVG): $(TARGET_SVG)/%.svg: $(SOURCE)/%_2d.scad | $(TARGET_SVG)
 	@echo Creating $@...
 	@openscad -o $@ -D _laserscad_mode=3 $(OVARS) $< 2> /dev/null
 	@echo Done.
