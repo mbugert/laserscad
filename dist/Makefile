@@ -13,8 +13,9 @@ INPUTS = $(shell grep -irlE --include=*.scad --exclude=*_2d.scad --exclude laser
 
 # outputs (targets) are files of the same name as the input files, but with dxf extension
 OUTPUTS = $(patsubst $(SOURCE)/%, $(TARGET)/%, $(INPUTS:.scad=.dxf))
+OUTPUTS_ENGRAVE = $(patsubst $(SOURCE)/%.scad, $(TARGET)/%_engrave.dxf, $(INPUTS))
 
-all: check_requirements $(OUTPUTS)
+all: check_requirements $(OUTPUTS) $(OUTPUTS_ENGRAVE)
 
 # python3 exists?
 check_requirements:
@@ -54,8 +55,13 @@ $(TEMP)/%_pos.csv: $(TEMP)/%_bb.csv | $(UTIL)
 $(SOURCE)/%_2d.scad: $(SOURCE)/%.scad $(TEMP)/%_pos.csv | $(UTIL)
 	@cp $< $@
 	@python3 $(UTIL)/writeback.py $@ $(word 2,$^)
+
+$(OUTPUTS_ENGRAVE): $(TARGET)/%_engrave.dxf: $(SOURCE)/%_2d.scad | $(TARGET)
+	@echo Creating $@...
+	@openscad -o $@ -D _laserscad_mode=3 $(OVARS) $< 2> /dev/null
+	@echo Done.
 	
 $(OUTPUTS): $(TARGET)/%.dxf: $(SOURCE)/%_2d.scad | $(TARGET)
 	@echo Creating $@...
-	@openscad -o $@ -D _laserscad_mode=3 $(OVARS) $< 2> /dev/null
+	@openscad -o $@ -D _laserscad_mode=4 $(OVARS) $< 2> /dev/null
 	@echo Done.
