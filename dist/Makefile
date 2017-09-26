@@ -9,7 +9,11 @@ TEMP := $(SOURCE_DIR)/_laserscad_temp
 UTIL := util
 OFLAGS =
 
-all: check_requirements $(SOURCE_DIR)/$(SOURCE_NAME).dxf
+all: check_requirements cut
+
+cut: $(SOURCE_DIR)$(SOURCE_NAME).dxf
+
+engrave: check_requirements $(SOURCE_DIR)$(SOURCE_NAME)_engrave.dxf
 
 # python3 exists?
 check_requirements:
@@ -18,7 +22,7 @@ check_requirements:
 clean:
 	@rm -rf $(TEMP)
 
-.PHONY: all clean check_requirements writeback
+.PHONY: all clean check_requirements writeback cut engrave
 
 #####################################################################
 
@@ -48,7 +52,12 @@ $(TEMP)/$(SOURCE_NAME)_pos.csv: $(TEMP)/$(SOURCE_NAME)_bb.csv | $(UTIL)
 writeback: $(TEMP)/$(SOURCE_NAME)_pos.csv $(TEMP) $(TEMP)/$(SOURCE_NAME)_deps.txt | $(UTIL)
 	@python3 $(UTIL)/writeback.py $^
 
-$(SOURCE_DIR)/$(SOURCE_NAME).dxf: $(TEMP)/$(SOURCE_NAME).scad writeback
+$(SOURCE_DIR)$(SOURCE_NAME)_engrave.dxf: $(TEMP)/$(SOURCE_NAME).scad writeback
 	@echo Exporting $@...
 	@openscad -o $@ -D _laserscad_mode=3 $(OFLAGS) $< 2> /dev/null
+	@echo Done.
+	
+$(SOURCE_DIR)$(SOURCE_NAME).dxf: $(TEMP)/$(SOURCE_NAME).scad writeback
+	@echo Exporting $@...
+	@openscad -o $@ -D _laserscad_mode=4 $(OFLAGS) $< 2> /dev/null
 	@echo Done.

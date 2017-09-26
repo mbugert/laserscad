@@ -1,5 +1,11 @@
-// 0: dev, 1: pack, 2: validate, 3: final
+// 0: dev, 1: pack, 2: validate, 3: engrave, 4: cut
 _laserscad_mode = 0;
+
+_ldummy_color = "Magenta";
+_ldummy_alpha = 0.6;
+_lengrave_color = "MediumSpringGreen";
+_bounding_box_color = "Magenta";
+_bounding_box_alpha = 0.6;
 
 // ############### TRANSFORMATIONS ################
 
@@ -32,11 +38,46 @@ module lmirror(vec) {
 
 module ldummy() {
     if (_laserscad_mode == 0) {
-        color("magenta", 0.6)
+        color(_ldummy_color, _ldummy_alpha)
             children();
     }   
 }
 
+
+// ################## lengrave ###################
+
+// purpose: lengraves are children of lparts. During the engrave phase, only the engraving should be rendered while other lpart children should be masked out. Therefore, translate the children of lparts with _lengrave_translation_z_helper in z-direction, negate this translation in lengrave, intersect to remove the non-engraving parts and (if the engraving is 3d) project on the xy-plane.
+_lengrave_translation_z_helper = 42;    // arbitrary choice
+_lengrave_intersection_z_helper = _lengrave_translation_z_helper - 1; // less than _lengrave_translation_z_helper is what counts
+
+module lengrave(parent_thick=1, children_are_2d=true) {
+    // TODO: if lpart not in stack: complain
+    
+    if (_laserscad_mode <= 0 || _laserscad_mode == 2) {
+        // dev/valid phase: show on surface of parent object
+        color(_lengrave_color)
+            translate([0, 0, parent_thick])
+                linear_extrude(height=1)
+                    if (!children_are_2d) {
+                        projection(cut=false)
+                            children();
+                    } else {
+                        children();
+                    }
+    } else if (_laserscad_mode == 3) {
+        // engrave phase: show on xy-plane (see explanation at _lengrave_translation_z_helper above)
+        if (!children_are_2d) {
+            projection(cut=false)
+                translate([0,0,-_lengrave_translation_z_helper])
+                    children();
+        } else {
+            translate([0,0,-_lengrave_translation_z_helper])
+                children();
+        }
+    } else if (_laserscad_mode == 1 || _laserscad_mode >= 4) {
+        // pack or cut phase: play dead
+    }
+}
 
 // ################### lpart ####################
 
@@ -64,24 +105,36 @@ _lmargin_default = 2;
 // actual lpart after sanity checks
 module _lpart_sane(id, dims) {   
     if (_laserscad_mode <= 0) {
+        // dev phase: all children shown, all operators apply
         children();
     } else {
         lkerf = lkerf == undef? _lkerf_default : lkerf;
         lmargin = lmargin == undef? _lmargin_default : lmargin;
 
         if (_laserscad_mode == 1) {
+            // pack phase: echo all the lpart dimensions
             ext_dims = dims + 2 * (lkerf + lmargin) * [1,1];
             echo(str("[laserscad] ##",id,",",ext_dims[0],",",ext_dims[1],"##"));
         } else {
+            // validate, engrave, cut phases: 2D translations apply
             translate(_lpart_translation(id) + (lkerf + lmargin)*[1,1,0]) {
-                // show the bounding box if in validate mode
-                if (_laserscad_mode == 2) {
-                    color("magenta", 0.6)
-                        square(dims + lkerf*[1,1]);
+                if (_laserscad_mode == 3) {
+                    // engrave phase: move non-engraving children out of the way (see explanation at _lengrave_translation_z_helper above)
+                    intersection() {
+                        translate([0,0,_lengrave_translation_z_helper])
+                            children();
+                        cube([dims[0], dims[1], _lengrave_intersection_z_helper]);
+                    }
+                } else {
+                    // validate phase: show bounding box
+                    if (_laserscad_mode == 2) {
+                        color(_bounding_box_color, _bounding_box_alpha)
+                            square(dims + lkerf*[1,1]);
+                    }
+                    offset(delta=lkerf)
+                        projection(cut=false)
+                            children();
                 }
-                offset(delta=lkerf)
-                    projection(cut=false)
-                        children();
             }
         }
     }
