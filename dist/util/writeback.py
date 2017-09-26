@@ -1,4 +1,4 @@
-import sys, csv
+import sys, csv, os
 
 
 def create_recursive_ternary_expr(translations):
@@ -10,7 +10,7 @@ def create_recursive_ternary_expr(translations):
 		return 'id=="{}"? {} : {}'.format(name, trans, tail)
 
 
-def writeback(scad_path, pos_path):
+def writeback(pos_path, scad_folder, scad_destination_paths_file):
 	'''Writes optimized object positions into a given SCAD file.
 	'''
 
@@ -21,10 +21,12 @@ def writeback(scad_path, pos_path):
 
 	_lpart_translation = "\nfunction _lpart_translation(id) = " + create_recursive_ternary_expr(translations)
 
-	with open(scad_path, 'a') as scad_file:
-		scad_file.write(_lpart_translation)
-		scad_file.write("\n_laserscad_mode=2;")
-
+	with open(scad_destination_paths_file, 'r') as paths_file:
+		for line in paths_file:
+			scad_path = os.path.join(scad_folder, line.strip())
+			with open(scad_path, 'a') as scad_file:
+				scad_file.write(_lpart_translation)
+				scad_file.write("\n_laserscad_mode=2;")
 
 if __name__=="__main__":
 	writeback(*sys.argv[1:])
