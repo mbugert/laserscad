@@ -58,22 +58,21 @@ module lengrave(parent_thick=1, children_are_2d=true) {
         color(_lengrave_color)
             translate([0, 0, parent_thick])
                 linear_extrude(height=1)
-                    if (!children_are_2d) {
+                    if (children_are_2d) {
+                        children();
+                    } else {
                         projection(cut=false)
                             children();
-                    } else {
-                        children();
                     }
     } else if (_laserscad_mode == 3) {
         // engrave phase: show on xy-plane (see explanation at _lengrave_translation_z_helper above)
-        if (!children_are_2d) {
-            projection(cut=false)
-                translate([0,0,-_lengrave_translation_z_helper])
-                    children();
-        } else {
-            translate([0,0,-_lengrave_translation_z_helper])
+        translate([0,0,-_lengrave_translation_z_helper])
+            if (children_are_2d) {
+                linear_extrude(height=1)            
+                        children();
+            } else {
                 children();
-        }
+            }
     } else if (_laserscad_mode == 1 || _laserscad_mode >= 4) {
         // pack or cut phase: play dead
     }
@@ -101,6 +100,7 @@ function _lpart_translation(id) = [0,0,0];
 
 _lkerf_default = 0;
 _lmargin_default = 2;
+lidentify = false;
 
 // actual lpart after sanity checks
 module _lpart_sane(id, dims) {   
@@ -120,11 +120,23 @@ module _lpart_sane(id, dims) {
             translate(_lpart_translation(id) + (lkerf + lmargin)*[1,1,0]) {
                 if (_laserscad_mode == 3) {
                     // engrave phase: move non-engraving children out of the way (see explanation at _lengrave_translation_z_helper above)
-                    intersection() {
-                        translate([0,0,_lengrave_translation_z_helper])
-                            children();
-                        cube([dims[0], dims[1], _lengrave_intersection_z_helper]);
-                    }
+                    projection(cut=false)
+                        intersection() {
+                            translate([0,0,_lengrave_translation_z_helper]) {
+                                children();
+                                
+                                // engrave the id of each lpart - rotate if necessary, so that the text fits
+                                if (lidentify) {
+                                    font_size = max(min(min(dims[0], dims[1])/4, 10), 5);
+                                    rotate_z = dims[0]<dims[1] ? 90 : 0;
+                                    lengrave()
+                                        translate(0.5*dims)
+                                            rotate([0,0,rotate_z])
+                                                text(id, halign="center", valign="center", size=font_size, spacing=0.8, font="Liberation Sans:style=Bold", $fn=5);
+                                }
+                            }
+                            cube([dims[0], dims[1], _lengrave_intersection_z_helper]);
+                        }
                 } else {
                     // validate phase: show bounding box
                     if (_laserscad_mode == 2) {
