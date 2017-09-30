@@ -9,7 +9,7 @@ SOURCE_NAME = $(basename $(notdir $(model)))
 SOURCE_DIR = $(dir $(model))
 TARGET_DIR = $(SOURCE_DIR)
 
-TEMP := $(SOURCE_DIR)_laserscad_temp/
+TEMP := $(SOURCE_DIR)_laserscad_temp
 UTIL := util/
 OFLAGS =
 
@@ -44,8 +44,8 @@ $(TEMP)$(SOURCE_NAME).scad: $(SOURCE_DIR) $(TEMP)$(SOURCE_NAME)_deps.txt
 # obtain bounding boxes of objects: use openscad to obtain the echo statements, then clean those up to obtain a csv file
 $(TEMP)$(SOURCE_NAME)_bb.csv: $(TEMP)$(SOURCE_NAME).scad | $(TEMP)
 	@echo Getting object bounding boxes...
-	@openscad $< -D _laserscad_mode=1 $(OFLAGS) -o $(TEMP)$*.echo
-	@grep -oE '##.*?##' $(TEMP)$*.echo | sed 's/#//g' > $@
+	@openscad -D _laserscad_mode=1 $(OFLAGS) -o $(TEMP)$(SOURCE_NAME).echo $<
+	@grep -oE '##.*?##' $(TEMP)$(SOURCE_NAME).echo | sed 's/#//g' > $@
 
 # optimize object placement
 $(TEMP)$(SOURCE_NAME)_pos.csv: $(TEMP)$(SOURCE_NAME)_bb.csv | $(UTIL)
