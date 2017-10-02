@@ -152,6 +152,21 @@ module _lpart_sane(id, dims) {
     }
 }
 
+// ################### lslice #####################
+
+// Slices children in the first octant from bottom to top and creates one lpart per slice. Slices are colored randomly so they're distinguishable.
+module lslice(id, dims, z, thickness) {   
+    for (i=[0:1:z/thickness]) {
+        color(c = rands(0,1,3))
+            ltranslate([0,0,i*thickness])
+                lpart(str(id,"_slice_",i), dims)
+                    linear_extrude(height=thickness)
+                        projection(cut=true)
+                            translate([0,0,-i*thickness])
+                                children();
+    }
+}
+
 
 // ########### MORE HINTS AND WARNINGS ############
 
