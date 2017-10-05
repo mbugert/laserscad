@@ -50,7 +50,7 @@ module ldummy() {
 _lengrave_translation_z_helper = 42;    // arbitrary choice
 _lengrave_intersection_z_helper = _lengrave_translation_z_helper - 1; // less than _lengrave_translation_z_helper is what counts
 
-module lengrave(parent_thick=1, children_are_2d=true) {
+module lengrave(parent_thick, children_are_2d) {
     // TODO: if lpart not in stack: complain
     
     if (_laserscad_mode <= 0 || _laserscad_mode == 2) {
@@ -129,7 +129,7 @@ module _lpart_sane(id, dims) {
                                 if (lidentify) {
                                     font_size = max(min(min(dims[0], dims[1])/4, 10), 5);
                                     rotate_z = dims[0]<dims[1] ? 90 : 0;
-                                    lengrave()
+                                    lengrave(1,true)
                                         translate(0.5*dims)
                                             rotate([0,0,rotate_z])
                                                 text(id, halign="center", valign="center", size=font_size, spacing=0.8, font="Liberation Sans:style=Bold", $fn=5);

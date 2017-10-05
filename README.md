@@ -5,7 +5,8 @@ A library for efficient lasercutting with OpenSCAD.
 ## Key Features
 * Laser whichever shape you want
 * Model in 3D, then run one command to generate a 2D lasercutting template with all parts
-* Save time and materials, because 2D parts are arranged automatically
+* Save time, because 2D parts are arranged automatically
+* *New in v0.2:* Add engravings to identify parts (or to make things look fancy)
 
 ## Installation
 
@@ -14,11 +15,11 @@ You will need:
 * ``openscad``, ``make``, ``python3`` installed
 
 To set up the library:
-* Download or clone the contents of this repository to a destination of your choice
+* [Download a release](https://github.com/mbugert/laserscad/releases) and unpack it to a destination of your choice
 * Move ``laserscad.scad`` from the ``dist`` folder into your [OpenSCAD library folder](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Libraries)
 
 ## Tutorial / Code Example
-The library is best explained with an example (scroll down if you are looking for a full API reference).
+The library is best explained with an example ([click here](#api) to jump to the full API reference).
 
 Say we want to create this small table which consists of a table top and two legs:
 
@@ -92,65 +93,100 @@ The full code for the example can be found at ``example/table.scad``.
 
 ### Generating the 2D laser template
 
-Say we saved the model in a file called ``table.scad``. To generate the lasering template, we first move the file into the ``scad`` folder of laserscad. Then, open a shell in the folder containing ``Makefile`` and run ``make``.
-
-As a result, the ``dxf`` folder will contain ``table.dxf``, ready for lasering:
+Say we saved the model to the file ``~/table.scad``. To generate the lasercutting template, we open a shell in the folder containing ``Makefile`` and run ``make model=~/table.scad``.
+This creates the file ``~/table.dxf`` which contains the template for our table:
 
 ![Lasercutting template for the table](docs/tutorial_table_04.png)
 
+There will also be a folder ``~/_laserscad_temp`` which, once we have the DXF file, can be removed manually or by calling ``make clean model=~/table.scad``.
 
-## API Reference / Function Overview
+
+## API Reference / Function Overview <a name="api"></a>
 This section covers modules/operators offered by laserscad and parameters related to lasering.
 
 ### Including the library
 ``include <laserscad.scad>``
 
 ### lpart
-Defines its children as a part for lasering.
-Children must be located in the first octant (in the positive x,y,z range). laserscad projects lparts on the xy-plane, i.e. it makes sense to model lparts as 2D objects in the xy-plane with a thickness in z-direction.
+Defines an single object which will be lasercut, consisting of its children.
+Children must be located in the first octant (in the positive x,y,z range). laserscad projects lparts on the xy-plane, i.e. lparts should be modeled as 2D objects in the xy-plane with a thickness in positive z-direction.
 
 ``lpart(id, [x, y]) { ... }``
 
 #### Parameters
 * *id*: unique identifier string
-* *[x, y]*: x and y dimensions of the hull around the children of this lpart
+* *[x, y]*: x and y dimensions of the hull around the children
 
 ### ltranslate
-Use ``ltranslate`` to translate ``lpart``s. Has the same method signature as the regular ``translate``. To move things around inside of ``lpart``, the regular ``translate`` needs to be used.
+Use ``ltranslate`` to translate ``lpart``s. Has the same method signature as the regular ``translate``. To move things around inside of ``lpart``, use the regular ``translate``.
 
 ### lrotate, lmirror
 Similar to ``ltranslate``.
 
 ### ldummy
-Children of ``ldummy`` are shown during development but are ignored when exporting to 2D. This can be useful for modeling laser-cut parts around (dummy) reference objects.
+Children of ``ldummy`` are shown during development but are ignored when exporting to 2D. This can be useful for modeling laser-cut parts around reference objects.
+
+### lengrave
+Adds an engraving to an lpart.
+``lengrave`` has to be used 
+
+``lengrave(parent_thick, children_are_2d) { ... }``
+
+#### Parameters
+* *parent_thick*: Thickness (in z-direction) of the lpart this lengrave is applied to. Only affects the development preview.
+* *children_are_2d*: Tells ``lengrave`` whether its children are a 2D object (``true``) or a 3D object (``false``).
+
+### lslice
+Children of ``lslice`` are sliced along the z-axis with a specifiable slice thickness. This creates multiple lparts at once. Children must be located in the first octant (in the positive x,y,z range).
+
+![lslice demonstration](docs/lslice.png)
+[Low Poly Stanford Bunny by johnny6](https://www.thingiverse.com/thing:151081) is licensed under the [Creative Commons - Attribution - Non-Commercial license](https://creativecommons.org/licenses/by-nc/3.0/).
+
+``lslice(id, [x, y], z, thickness) { ... }``
+
+#### Parameters
+* *id*: unique identifier string
+* *[x, y]*: x and y dimensions of the hull around the children
+* *z*: z dimension of the hull around the children
+* *thickness*: slice thickness
 
 ### Parameters
 These parameters can be defined in the global scope of a scad file.
 
 #### lkerf
-Compensate laser kerf (shrinkage caused by the laser) in millimeters. *Default = 0*
+Compensate kerf (shrinkage caused by the laser beam) for all lparts in millimeters. *Default = 0*
 
 #### lmargin
-Distance between lparts in 2D in millimeters. *Default = 2*
+Distance between lparts in the 2D template in millimeters. *Default = 2*
+
+#### lidentify
+Assembling models with many similar-looking lparts can be a challenge. If the boolean ``lidentify`` parameter is set to ``true``, each lpart will be engraved with its unique id, eliminating any confusion. *Default = false*
 
 ### Exporting to 2D
-1. Drag your ``.scad`` source file(s) into the ``scad`` folder.
-2. Open a shell in the folder containing ``Makefile`` and run ``make``. The resulting DXF files are located in the ``dxf`` folder.
-3. *Recommended:* Open ``scad/<your-model>_2d.scad`` with OpenSCAD to verify that all ``lpart`` dimensions were defined correctly and nothing overlaps.
+This is a reference of the commands for exporting a lasercutting template or engravings.
 
-### Sheet Size
-There is currently no nice way of specifying the sheet size. However, it can be changed with a text editor in the ``Makefile``. The default is 600x300 (millimeters).
+#### Lasercutting template
+1. Open a shell and ``cd`` into the directory containing the ``Makefile``.
+2. Run ``make model=path/to/your/model.scad``, where the path is a relative or absolute path pointing to the OpenSCAD model you want to export. This creates a lasercutting template as a DXF file in the same folder as your model.
+3. *Recommended:* Check ``_laserscad_temp/<your-model>_2d.scad`` to verify that all ``lpart`` dimensions were defined correctly and nothing overlaps. The ``_laserscad_temp`` folder is safe to delete, by the way.
+
+#### Engravings
+Replace step 2 from above with ``make engrave model=path/to/your/model.scad``. This creates an SVG file with the engravings in the same folder as your model.
+To export the lasercutting file and the engravings in one go, run ``make -j 2 cut engrave model=...``.
+
+#### Sheet Size
+The default sheet size for arranging parts is 600x300 (millimeters). To export for a different size, add the parameters ``sheet_xlen=... sheet_ylen=...`` when calling ``make``.
 
 ## FAQ
 ### What does laserscad do?
-It simplifies and accelerates the process of creating 2D laser cut objects with OpenSCAD.
+It simplifies and accelerates the process of creating 2D laser-cut objects with OpenSCAD.
 
 ### What does laserscad not do?
 It does not offer methods for creating boxes, different types of joints, and so on.
 There are, however, several other OpenSCAD libraries for this purpose (like [lasercut](https://github.com/bmsleight/lasercut) or [JointSCAD](https://github.com/HopefulLlama/JointSCAD)) which work great together with laserscad.
 
+### Meh, examples. Show me a real application.
+That's not a question. Anyway, here you go: [Korg Volca Case made with laserscad](https://github.com/mbugert/volca-case)
+
 ### How does it work internally?
-It's a three-stage process:
-1. The user's model is built with openscad. Meanwhile, laserscad echoes the ids and dimensions of every lpart, which are collected in a file.
-2. A python script reads this file and computes a position for every lpart.
-3. A second python script merges the computed positions with the user's scad file, which can then be rendered in DXF format.
+Several steps are performed internally. First, the library identifies all dependencies of the user's model. Then, the user's model is built with openscad. Meanwhile, laserscad echoes the ids and dimensions of every lpart, which are collected in a file. A python script reads this file and computes a position for every lpart. A second python script merges the computed positions with the user's scad file (and all its dependencies), which can then be exported.

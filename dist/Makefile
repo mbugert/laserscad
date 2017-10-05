@@ -9,7 +9,7 @@ SOURCE_NAME = $(basename $(notdir $(model)))
 SOURCE_DIR = $(dir $(model))
 TARGET_DIR = $(SOURCE_DIR)
 
-TEMP := $(SOURCE_DIR)_laserscad_temp
+TEMP := $(SOURCE_DIR)_laserscad_temp/
 UTIL := util/
 OFLAGS =
 
