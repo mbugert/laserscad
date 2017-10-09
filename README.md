@@ -139,7 +139,7 @@ To elaborate on this: ``lengrave`` must be used inside of ``lpart``. What is bei
 #### Example
 See ``docs/examples/engraving.scad``.
 
-#TODO images/photos!
+![Picture of a pattern engraved on an MDF sheet](docs/engraving.jpg)
 
 
 ### lslice
