@@ -5,7 +5,7 @@ y = 30;
 thickness = 3;
 
 lpart("rectangle", [x, y]) {
-    lengrave(parent_thick=thickness, children_are_2d=true) {
+    lengrave(thickness, true) {
         // pacman
         translate([0.25*x, y/2, 0])    
             difference() {
