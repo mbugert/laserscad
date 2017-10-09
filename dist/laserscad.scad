@@ -1,4 +1,4 @@
-// 0: dev, 1: pack, 2: validate, 3: engrave, 4: cut
+// 0: dev, 1: pack, 2: preview, 3: engrave, 4: cut
 _laserscad_mode = 0;
 
 _ldummy_color = "Magenta";
@@ -54,7 +54,7 @@ module lengrave(parent_thick, children_are_2d) {
     // TODO: if lpart not in stack: complain
     
     if (_laserscad_mode <= 0 || _laserscad_mode == 2) {
-        // dev/valid phase: show on surface of parent object
+        // dev/preview phase: show on surface of parent object
         color(_lengrave_color)
             translate([0, 0, parent_thick])
                 linear_extrude(height=1)
@@ -116,7 +116,7 @@ module _lpart_sane(id, dims) {
             ext_dims = dims + 2 * (lkerf + lmargin) * [1,1];
             echo(str("[laserscad] ##",id,",",ext_dims[0],",",ext_dims[1],"##"));
         } else {
-            // validate, engrave, cut phases: 2D translations apply
+            // preview, engrave, cut phases: 2D translations apply
             translate(_lpart_translation(id) + (lkerf + lmargin)*[1,1,0]) {
                 if (_laserscad_mode == 3) {
                     // engrave phase: move non-engraving children out of the way (see explanation at _lengrave_translation_z_helper above)
@@ -138,7 +138,7 @@ module _lpart_sane(id, dims) {
                             cube([dims[0], dims[1], _lengrave_intersection_z_helper]);
                         }
                 } else {
-                    // validate phase: show bounding box
+                    // preview phase: show bounding box
                     if (_laserscad_mode == 2) {
                         color(_bounding_box_color, _bounding_box_alpha)
                             square(dims + lkerf*[1,1]);
@@ -159,7 +159,7 @@ module lslice(id, dims, z, thickness) {
     for (i=[0:1:z/thickness]) {
         color(c = rands(0,1,3))
             ltranslate([0,0,i*thickness])
-                lpart(str(id,"_slice_",i), dims)
+                lpart(str(i,id), dims)
                     linear_extrude(height=thickness)
                         projection(cut=true)
                             translate([0,0,-i*thickness])
