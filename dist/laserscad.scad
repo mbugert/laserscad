@@ -100,7 +100,7 @@ function _lpart_translation(id) = [0,0,0];
 
 _lkerf_default = 0;
 _lmargin_default = 2;
-lidentify = false;
+_lidentify_default = false;
 
 // actual lpart after sanity checks
 module _lpart_sane(id, dims) {   
@@ -110,6 +110,7 @@ module _lpart_sane(id, dims) {
     } else {
         lkerf = lkerf == undef? _lkerf_default : lkerf;
         lmargin = lmargin == undef? _lmargin_default : lmargin;
+        lidentify = lidentify == undef? _lidentify_default : lidentify;
 
         if (_laserscad_mode == 1) {
             // pack phase: echo all the lpart dimensions
@@ -155,7 +156,7 @@ module _lpart_sane(id, dims) {
 // ################### lslice #####################
 
 // Slices children in the first octant from bottom to top and creates one lpart per slice. Slices are colored randomly so they're distinguishable.
-module lslice(id, dims, z, thickness) {   
+module lslice(id, dims, z, thickness) {
     for (i=[0:1:z/thickness]) {
         color(c = rands(0,1,3))
             ltranslate([0,0,i*thickness])
@@ -174,6 +175,7 @@ module lslice(id, dims, z, thickness) {
 if (_laserscad_mode == 0) {
     _laserscad_var_sanity_check(lkerf, "lkerf", _lkerf_default);
     _laserscad_var_sanity_check(lmargin, "lmargin", _lmargin_default);
+    _laserscad_var_sanity_check(lidentify, "lidentify", _lidentify_default);
 }
 
 module _laserscad_var_sanity_check(var, name, default) {

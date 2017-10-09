@@ -2,10 +2,11 @@
 // License at: https://creativecommons.org/licenses/by-nc/3.0/
 // Model at: https://www.thingiverse.com/thing:151081
 
-use <laserscad.scad>
+include <laserscad.scad>
 
 // layer thickness
 t = 3;
+lidentify=true;
 
 bunny_dims = [90, 67.5];
 bunny_z = 82.5;
@@ -15,7 +16,7 @@ pin2_dims = [bunny_dims[0] / 15, bunny_dims[1] / 1.65, t];
 pin2_pos = [0.15*bunny_dims[0], 0.4*bunny_dims[1], bunny_z / 4.5];
 
 module bunny() {
-    lslice("bunny", bunny_dims, bunny_z, t)
+    lslice("b", bunny_dims, bunny_z, t)
         difference() {
             scale(0.75)
                 translate([24,42,-5.4])
