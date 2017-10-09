@@ -2,6 +2,8 @@
 
 A library for efficient lasercutting with OpenSCAD.
 
+![Dominoes modelled using laserscad](docs/dominoes.jpg)
+
 ## Key Features
 * Laser whichever shape you want
 * Model in 3D, then run one command to generate a 2D lasercutting template with all parts
