@@ -164,7 +164,7 @@ See ``docs/examples/slicing.scad``.
 ### Other laserscad Parameters
 Advanced features of laserscad can be enabled by specifying these parameters anywhere in the global scope of a scad file.
 
-*A note about OpenSCAD models consisting of multiple files: These parameter definitions have to find their way into every file where ``lpart`` is used. The easiest solution to this is to specify the parameters in some ``settings.scad`` file which is imported in everywhere via ``include <settings.scad>``.*
+*A note about OpenSCAD models consisting of multiple files:* These parameter definitions have to find their way into every file where ``lpart`` is used. The easiest solution to this is to specify the parameters in some ``settings.scad`` file which is imported in everywhere via ``include <settings.scad>``.
 
 #### lkerf
 Compensate kerf (shrinkage caused by the laser beam) for all lparts in millimeters. *Default = 0*
@@ -180,14 +180,18 @@ This is a reference of the commands for exporting a template for lasercutting or
 
 #### Lasercutting template
 Open a shell and run:
-``cd laserscad/dist``
-``make engrave model=path/to/your/model.scad``
+```
+cd laserscad/dist
+make engrave model=path/to/your/model.scad
+```
 
 The path can be a relative or absolute path pointing to the OpenSCAD model you want to export. This creates a lasercutting template as a DXF file in the same folder as your model.
 
 #### Engravings
-``cd laserscad/dist``
-``make engrave model=path/to/your/model.scad``
+```
+cd laserscad/dist
+make engrave model=path/to/your/model.scad
+```
 
 This creates an SVG file with the engravings in the same folder as your model.
 *Hint:* To export the lasercutting template and the engravings in one go, run:
@@ -195,15 +199,19 @@ This creates an SVG file with the engravings in the same folder as your model.
 
 #### Lasercutting preview
 To check if all ``lpart`` dimensions were defined correctly and nothing overlaps, run:
-``cd laserscad/dist``
-``make preview model=path/to/your/model.scad``
+```
+cd laserscad/dist
+make preview model=path/to/your/model.scad
+```
 
 *Note:* Engravings are not shown in the preview.
 
 #### Cleaning up
 The ``_laserscad_temp`` folder can be deleted manually, or via:
-``cd laserscad/dist``
-``make clean model=path/to/your/model.scad``
+```
+cd laserscad/dist
+make clean model=path/to/your/model.scad
+```
 
 #### Sheet Size
 The default sheet size for arranging parts is 600x300 (millimeters). To export for a different size, add the parameters ``sheet_xlen=... sheet_ylen=...`` when calling ``make``.
