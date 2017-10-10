@@ -30,7 +30,7 @@ engrave: check_requirements $(ENGRAVING_TEMPLATE)
 
 preview: check_requirements _preview
 
-# python3 exists? make at least version 4.2?
+# python3 exists?
 check_requirements:
 	@which python3 > /dev/null
 
