@@ -157,8 +157,7 @@ Children of ``lslice`` are sliced along the z-axis with a specifiable slice thic
 
 #### Example
 See ``docs/examples/slicing.scad``.
-# TODO images/photos
-![lslice demonstration](docs/lslice.png)
+![lslice demonstration](docs/slicing.jpg)
 [Low Poly Stanford Bunny by johnny6](https://www.thingiverse.com/thing:151081) is licensed under the [Creative Commons - Attribution - Non-Commercial license](https://creativecommons.org/licenses/by-nc/3.0/).
 
 ### Other laserscad Parameters
