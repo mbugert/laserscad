@@ -81,7 +81,7 @@ module leg(id) {
 }
 ```
 
-Note how in this code snippet, ``lpart`` can contain an arbitrarily complex shape. Also, the leg is created lying in the xy-plane and is later rotated using ``lrotate``. This is necessary because laserscad requires lparts to lie in the xy-plane for lasering.
+Note how in this code snippet, ``lpart`` can contain an arbitrarily complex shape. Also, the leg is created lying in the xy-plane and is later rotated using ``lrotate``. This is necessary because laserscad requires lparts to lie in the xy-plane for lasercutting.
 
 If we instantiate a leg with ``leg("left");`` it will look like this:
 
@@ -104,13 +104,13 @@ There will also be a folder ``~/_laserscad_temp`` which, once we have the DXF fi
 
 
 ## API Reference / Function Overview <a name="api"></a>
-This section covers modules/operators offered by laserscad and parameters related to lasering.
+This section covers modules/operators offered by laserscad and parameters related to lasercutting.
 
 ### Including the library
 ``include <laserscad.scad>``
 
 ### lpart
-Defines an single object which will be lasercut, consisting of its children.
+Defines a single object which will be lasercut, consisting of its children.
 Children must be located in the first octant (in the positive x,y,z range). laserscad projects lparts on the xy-plane, i.e. lparts should be modeled as 3D objects lying on the xy-plane with a thickness in positive z-direction.
 
 ``lpart(id, [x, y]) { ... }``
@@ -120,7 +120,7 @@ Children must be located in the first octant (in the positive x,y,z range). lase
 * *[x, y]*: x and y dimensions of the hull around the children
 
 ### ltranslate
-Use ``ltranslate`` to translate ``lpart``s. Has the same method signature as the regular ``translate``. To move things around inside of ``lpart``, use the regular ``translate``.
+Use ``ltranslate`` to translate lparts. Has the same method signature as the regular ``translate``. To move things around inside of lpart, use the regular ``translate``.
 
 ### lrotate, lmirror
 Similar to ``ltranslate``.
@@ -136,7 +136,7 @@ To elaborate on this: ``lengrave`` must be used inside of ``lpart``. What is bei
 
 #### Parameters
 * *parent_thick*: Thickness (in z-direction) of the lpart this lengrave is applied to. Only affects the development preview.
-* *children_are_2d*: Tells ``lengrave`` whether its children are a 2D object (``true``) or a 3D object (``false``).
+* *children_are_2d*: Tells lengrave whether its children are a 2D object (``true``) or a 3D object (``false``).
 
 #### Example
 See ``docs/examples/engraving.scad``.
@@ -163,7 +163,7 @@ See ``docs/examples/slicing.scad``.
 ### Other laserscad Parameters
 Advanced features of laserscad can be enabled by specifying these parameters anywhere in the global scope of a scad file.
 
-*A note about OpenSCAD models consisting of multiple files:* These parameter definitions have to find their way into every file where ``lpart`` is used. The easiest solution to this is to specify the parameters in some ``settings.scad`` file which is imported in everywhere via ``include <settings.scad>``.
+*A note about OpenSCAD models consisting of multiple files:* These parameter definitions have to find their way into every file where ``lpart`` is used. The easiest solution to this is to specify the parameters in some settings.scad file which is imported in everywhere via ``include <settings.scad>``.
 
 #### lkerf
 Compensate kerf (shrinkage caused by the laser beam) for all lparts in millimeters. *Default = 0*
@@ -227,4 +227,4 @@ There are, however, several other OpenSCAD libraries for this purpose (like [las
 That's not a question. Anyway, here you go: [Korg Volca Case made with laserscad](https://github.com/mbugert/volca-case)
 
 ### How does it work internally?
-Several steps are performed internally. The user's model is built with openscad. Meanwhile, laserscad echoes the ids and dimensions of every ``lpart``, which are collected in a file. A python script reads this file and computes a position for every ``lpart``. These positions are used when exporting 2D templates.
+Several steps are performed internally. The user's model is built with openscad. Meanwhile, laserscad echoes the ids and dimensions of every lpart, which are collected in a file. A python script reads this file and computes a position for every lpart. These positions are used when exporting 2D templates.
