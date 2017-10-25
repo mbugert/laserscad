@@ -14,7 +14,7 @@ A library for efficient lasercutting with OpenSCAD.
 
 You will need:
 * A linux-based OS
-* ``openscad``, ``make``, ``python3`` installed
+* ``openscad`` 2015.03, ``make``, ``python3`` installed
 
 To set up the library:
 * [Download a release](https://github.com/mbugert/laserscad/releases) and unpack it to a destination of your choice
