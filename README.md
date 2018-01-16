@@ -193,8 +193,13 @@ make engrave model=path/to/your/model.scad
 ```
 
 This creates an SVG file with the engravings in the same folder as your model.
+
 *Hint:* To export the lasercutting template and the engravings in one go, run:
 ``make -j 2 cut engrave model=path/to/your/model.scad``
+
+Additional options are available for `make engrave`:
+* `model_unit`: By default, laserscad assumes that a length of 1 in OpenSCAD corresponds to 1mm in real life. A different unit can be specified, for example `model_unit=in`. The complete list of allowed values can be found in [the W3C SVG specification](https://www.w3.org/TR/SVG/types.html#DataTypeLength).
+* `engrave_stroke_width`: By default, laserscad removes the outline in SVGs because it causes artifacts when engraving complex small shapes. The outline can be re-enabled by specifying a width, for example `engrave_stroke_width=0.5`. Refer to the [W3C SVG Strokes Specification](https://www.w3.org/TR/svg-strokes/#StrokeWidth) for allowed values.
 
 #### Lasercutting preview
 To check if all ``lpart`` dimensions were defined correctly and nothing overlaps, run:
