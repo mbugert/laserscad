@@ -1,5 +1,7 @@
 sheet_xlen = 600
 sheet_ylen = 300
+model_unit = "mm"
+engrave_stroke_width = "0"
 
 ifndef model
 $(error Usage: make model=path/to/your/model.scad)
@@ -65,7 +67,7 @@ $(ENGRAVING_TEMPLATE): $(SOURCE) $(CMDLINE_ARGS_FILE)
 	@echo Exporting $@...
 	$(eval TRANSLATION_FUNC = $(shell cat $(CMDLINE_ARGS_FILE)))
 	@openscad -o $@ -D _laserscad_mode=3 -D '$(TRANSLATION_FUNC)' $(OFLAGS) $< 2> /dev/null
-	@sed -i -E 's/width="([0-9]+)"\s+height="([0-9]+)"/width="\1mm" height="\2mm"/' $@
+	@python3 $(UTIL)modify_svg.py $@ $(model_unit) $(engrave_stroke_width)
 	@echo Done.
 	
 $(CUTTING_TEMPLATE): $(SOURCE) $(CMDLINE_ARGS_FILE)
