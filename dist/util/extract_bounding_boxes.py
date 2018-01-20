@@ -49,7 +49,13 @@ def extract(src, dest):
 
 		if any(bb_matches):
 			with open(dest, 'w') as file:
-				file.write("\n".join([match.group(1) for match in bb_matches]))
+				file.write("\n".join([match.group(1) for match in bb_matches if match]))
+
+			# print laserscad-unrelated ECHOs which users might have added
+			other_echoes = [message for message, match in zip(messages["ECHO"], bb_matches) if not match]
+			if other_echoes:
+				prefix = "\n  ECHO: "
+				hint("OpenSCAD reports:" + prefix + prefix.join(other_echoes))
 		else:
 			no_lparts = True
 	if no_lparts:
@@ -63,6 +69,10 @@ def fail(message):
 
 def warn(message):
 	print(message, file=sys.stderr)
+
+
+def hint(message):
+	print(message)
 
 
 if __name__=="__main__":
