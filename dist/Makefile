@@ -66,7 +66,7 @@ $(TEMP):
 $(BOUNDING_BOXES) $(ECHO): $(SOURCE) | $(TEMP)
 	@echo Getting object bounding boxes...
 	@openscad -D _laserscad_mode=1 $(OFLAGS) -o $(ECHO) $<
-	@grep -oE '##.*?##' $(ECHO) | sed 's/#//g' > $@
+	@python3 $(UTIL)extract_bounding_boxes.py $(ECHO) $(BOUNDING_BOXES)
 
 # optimize object placement
 $(ARRANGEMENT): $(BOUNDING_BOXES) | $(UTIL)
