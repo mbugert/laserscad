@@ -186,8 +186,8 @@ module lslice(id, dims, z, thickness) {
 
 // ########### MORE HINTS AND WARNINGS ############
 
-// print hints in dev mode if variables are undefined
-if (_laserscad_mode == 0) {
+// print hints in dev and pack mode if variables are undefined
+if (_laserscad_mode <= 1) {
     _laserscad_var_sanity_check(lkerf, "lkerf", _lkerf_default);
     _laserscad_var_sanity_check(lmargin, "lmargin", _lmargin_default);
     _laserscad_var_sanity_check(lidentify, "lidentify", _lidentify_default);
@@ -195,7 +195,7 @@ if (_laserscad_mode == 0) {
 
 module _laserscad_var_sanity_check(var, name, default) {
     if (var==undef) {
-        echo(str("HINT: Variable \"", name, "\" was not specified. Using default value ", default, "."));
+        echo(str("Variable \"", name, "\" was not specified. Using default value ", default, "."));
     }    
 }
 
