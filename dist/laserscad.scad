@@ -67,7 +67,18 @@ _lengrave_intersection_z_helper = _lengrave_translation_z_helper - 1; // less th
 
 module lengrave(parent_thick, children_are_2d) {
     // TODO: if lpart not in stack: complain
-    
+    // sanity checks
+    if (parent_thick == undef || parent_thick <= 0) {
+        echo(str("WARNING: lengrave at ", _laserscad_stack(), " has parent_thick=", parent_thick, " but parent_thick values must be positive."));
+    } else if (children_are_2d == undef) {
+        echo(str("WARNING: lengrave at ", _laserscad_stack(), " has children_are_2d=", children_are_2d, " but children_are_2d values must be boolean."));
+    } else {
+        _lengrave_sane(parent_thick, children_are_2d)
+            children();
+    }    
+}
+
+module _lengrave_sane(parent_thick, children_are_2d) {
     if (_laserscad_mode <= 0 || _laserscad_mode == 2) {
         // dev/preview phase: show on surface of parent object
         color(_lengrave_color)
@@ -97,14 +108,8 @@ module lengrave(parent_thick, children_are_2d) {
 
 // unique id of to-be-lasered object and its dimensions as a 2-element vector
 module lpart(id, dims) {
-    // sanity checks
-    if (id == undef) {
-        echo(str("WARNING: Undefined lpart id at:\n", _laserscad_stack()));
-    } else if (len(dims) != 2) {
-        echo(str("WARNING: lpart \"", id, "\" has dimensions ", dims, " but expected are dimensions of shape [x,y]."));
-    } else if (dims[0] <= 0 || dims[1] <= 0) {
-        echo(str("WARNING: lpart \"", id, "\" has dims=", dims, " but dims must be positive values."));
-    } else {
+    // sanity check
+    _laserscad_id_dims_check(id, dims, "lpart") {
         _lpart_sane(id, dims)
             children();
     }
@@ -172,6 +177,20 @@ module _lpart_sane(id, dims) {
 
 // Slices children in the first octant from bottom to top and creates one lpart per slice. Slices are colored randomly so they're distinguishable.
 module lslice(id, dims, z, thickness) {
+    _laserscad_id_dims_check(id, dims, "lslice") {
+        // additional sanity checks for z and thickness
+        if (z == undef || z <= 0) {
+            echo(str("WARNING: lslice ", id, " has z=", z, " but z values must be positive."));
+        } else if (thickness == undef || thickness <= 0) {
+            echo(str("WARNING: lslice ", id, " has thickness=", thickness, " but thickness values must be positive."));
+        } else {
+            _lslice_sane(id, dims, z, thickness)
+                children();
+        }
+    }
+}
+
+module _lslice_sane(id, dims, z, thickness) {
     for (i=[0:1:z/thickness]) {
         color(c = rands(0,1,3))
             ltranslate([0,0,i*thickness])
@@ -200,3 +219,19 @@ module _laserscad_var_sanity_check(var, name, default) {
 }
 
 function _laserscad_stack() = str([for (i=[$parent_modules-1:-1:0]) parent_module(i)]);
+
+module _laserscad_id_dims_check(id, dims, what) {
+    if (id == undef) {
+        echo(str("WARNING: Undefined ", what, " id at:\n", _laserscad_stack()));
+    } else if (len(id) == 0) {
+        echo(str("WARNING: Empty ", what, " id at:\n", _laserscad_stack()));
+    } else if (dims == undef) {
+        echo(str("WARNING: Undefined ", what, " dimensions at:\n", _laserscad_stack()));
+    } else if (len(dims) != 2) {
+        echo(str("WARNING: ", what, " \"", id, "\" has dimensions ", dims, " but expected are dimensions of shape [x,y]."));
+    } else if (dims[0] <= 0 || dims[1] <= 0) {
+        echo(str("WARNING: ", what, " \"", id, "\" has dims=", dims, " but dims must be positive values."));
+    } else {
+        children();
+    }
+}
