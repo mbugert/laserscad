@@ -16,7 +16,7 @@
 import sys
 import re
 
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 
 def extract(src, dest):
@@ -48,8 +48,15 @@ def extract(src, dest):
 		bb_matches = [laserscad_message_pattern.match(line) for line in messages["ECHO"]]
 
 		if any(bb_matches):
-			with open(dest, 'w') as file:
-				file.write("\n".join([match.group(1) for match in bb_matches if match]))
+			bb_lines = [match.group(1) for match in bb_matches if match]
+
+			lpart_ids = [t.split(",")[0] for t in bb_lines]
+			duplicate_lpart_ids = [lpart_id for lpart_id, count in Counter(lpart_ids).items() if count > 1]
+			if duplicate_lpart_ids:
+				fail("Error: Duplicate lpart id's: {}".format(", ".join(duplicate_lpart_ids)))
+			else:
+				with open(dest, 'w') as file:
+					file.write("\n".join([line for line in bb_lines]))
 
 			# print laserscad-unrelated ECHOs which users might have added
 			other_echoes = [message for message, match in zip(messages["ECHO"], bb_matches) if not match]
