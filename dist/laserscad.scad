@@ -13,6 +13,7 @@
 // You should have received a copy of the Lesser GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 // 0: dev, 1: pack, 2: preview, 3: engrave, 4: cut
 _laserscad_mode = 0;
 
@@ -21,6 +22,24 @@ _ldummy_alpha = 0.6;
 _lengrave_color = "MediumSpringGreen";
 _bounding_box_color = "Magenta";
 _bounding_box_alpha = 0.6;
+
+
+// ############### VERSION CHECK UTILITIES ################
+
+_laserscad_version_major = 0;
+_laserscad_version_minor = 3;
+_laserscad_version_patch = 0;
+
+// complains if major version mismatches or if minor version isn't high enough - minor version will be ignored if argument is negative
+module lassert_version(major=0, minor=-1) {
+    major_match = major == _laserscad_version_major;
+    minor_match = minor < 0 || minor <= _laserscad_version_minor;
+    
+    if (!major_match || !minor_match) {
+        echo(str("WARNING: This is laserscad ", _laserscad_version_major, ".", _laserscad_version_minor, ".", _laserscad_version_patch, " but the model requires version ", major, ".", (minor < 0? "x" : minor), ".x"));
+    }
+}
+
 
 // ############### TRANSFORMATIONS ################
 

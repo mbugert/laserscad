@@ -1,4 +1,4 @@
-# laserscad
+# laserscad 0.3.0
 
 A library for efficient lasercutting with OpenSCAD.
 
@@ -8,7 +8,7 @@ A library for efficient lasercutting with OpenSCAD.
 * Laser whichever shape you want
 * Model in 3D, then run one command to generate a 2D lasercutting template with all parts
 * Save time, because 2D parts are arranged automatically
-* *New in v0.2:* Add engravings to identify parts (or to make things look fancy)
+* *New in 0.2.0:* Add engravings to identify parts (or to make things look fancy)
 
 ## Installation
 
@@ -159,6 +159,19 @@ Children of ``lslice`` are sliced along the z-axis with a specifiable slice thic
 See ``docs/examples/slicing.scad``.
 ![lslice demonstration](docs/slicing.jpg)
 [Low Poly Stanford Bunny by johnny6](https://www.thingiverse.com/thing:151081) is licensed under the [Creative Commons - Attribution - Non-Commercial license](https://creativecommons.org/licenses/by-nc/3.0/).
+
+### lassert_version
+laserscad uses [semantic versioning](https://semver.org/). With `lassert_version`, one can specify the laserscad version required by a model. This is a bonus feature. It is not necessary to use `lassert_version`, but it can help to keep one's projects organized.
+
+``lassert_version(major=..., minor=...);``
+
+#### Parameters
+* *major*: the exact major version required
+* *minor*: minimum required minor version or `-1` to accept any minor version
+
+#### Examples
+* `major=0, minor=3` would accept laserscad 0.3.0, 0.3.1, 0.4.0, etc. but not 0.2.0 or 1.0.0
+* `major=1, minor=-1` would accept any laserscad 1.x.x (hence 1.0.0, 1.1.0, 1.1.1, etc.) but none of 0.x.x (0.3.0, 0.3.1, etc.)
 
 ### Other laserscad Parameters
 Advanced features of laserscad can be enabled by specifying these parameters anywhere in the global scope of a scad file.
