@@ -194,7 +194,7 @@ This is a reference of the commands for exporting a template for lasercutting or
 Open a shell and run:
 ```
 cd laserscad/dist
-make engrave model=path/to/your/model.scad
+make cut model=path/to/your/model.scad
 ```
 
 The path can be a relative or absolute path pointing to the OpenSCAD model you want to export. This creates a lasercutting template as a DXF file in the same folder as your model.
