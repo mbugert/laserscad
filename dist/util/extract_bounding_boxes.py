@@ -33,7 +33,7 @@ def extract(src, dest):
 		fail("OpenSCAD reports:" + prefix + prefix.join(messages["ERROR"]))
 
 	if "WARNING" in messages:
-		is_laserscad_missing = any("laserscad.scad" in m for m in messages["WARNING"])
+		is_laserscad_missing = any("cannot find 'laserscad.scad'" in m for m in messages["WARNING"])
 		if is_laserscad_missing:
 			fail("Error: OpenSCAD cannot find 'laserscad.scad'. Put 'laserscad.scad' in the OpenSCAD libraries folder or in the same folder as your model.")
 		else:
