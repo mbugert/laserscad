@@ -1,4 +1,4 @@
-# laserscad 0.3.0
+# laserscad 0.3.1
 
 A library for efficient lasercutting with OpenSCAD.
 
