@@ -23,6 +23,27 @@ _lengrave_color = "MediumSpringGreen";
 _bounding_box_color = "Magenta";
 _bounding_box_alpha = 0.6;
 
+_lkerf_default = 0;
+_lmargin_default = 2;
+_lidentify_default = false;
+
+_lkerf_undef = is_undef(lkerf);
+_lmargin_undef = is_undef(lmargin);
+_lidentify_undef = is_undef(lidentify);
+
+lkerf = _lkerf_undef ? _lkerf_default : lkerf;
+lmargin = _lmargin_undef ? _lmargin_default : lmargin;
+lidentify = _lidentify_undef ? _lidentify_default : lidentify;
+
+_laserscad_var_sanity_check(_lkerf_undef, "lkerf", _lkerf_default);
+_laserscad_var_sanity_check(_lmargin_undef, "lmargin", _lmargin_default);
+_laserscad_var_sanity_check(_lidentify_undef, "lidentify", _lidentify_default);
+
+module _laserscad_var_sanity_check(undefined, name, default) {
+    if (undefined && _laserscad_mode <= 1) {
+        echo(str("Variable \"", name, "\" was not specified. Using default value ", default, "."));
+    }
+}
 
 // ############### VERSION CHECK UTILITIES ################
 
@@ -137,20 +158,12 @@ module lpart(id, dims) {
 // overwritten once optimal translations are known after packing
 function _lpart_translation(id) = [0,0,0];
 
-_lkerf_default = 0;
-_lmargin_default = 2;
-_lidentify_default = false;
-
 // actual lpart after sanity checks
-module _lpart_sane(id, dims) {   
+module _lpart_sane(id, dims) {
     if (_laserscad_mode <= 0) {
         // dev phase: all children shown, all operators apply
         children();
     } else {
-        lkerf = lkerf == undef? _lkerf_default : lkerf;
-        lmargin = lmargin == undef? _lmargin_default : lmargin;
-        lidentify = lidentify == undef? _lidentify_default : lidentify;
-
         if (_laserscad_mode == 1) {
             // pack phase: echo all the lpart dimensions
             ext_dims = dims + 2 * (lkerf + lmargin) * [1,1];
@@ -223,19 +236,6 @@ module _lslice_sane(id, dims, z, thickness) {
 
 
 // ########### MORE HINTS AND WARNINGS ############
-
-// print hints in dev and pack mode if variables are undefined
-if (_laserscad_mode <= 1) {
-    _laserscad_var_sanity_check(lkerf, "lkerf", _lkerf_default);
-    _laserscad_var_sanity_check(lmargin, "lmargin", _lmargin_default);
-    _laserscad_var_sanity_check(lidentify, "lidentify", _lidentify_default);
-}
-
-module _laserscad_var_sanity_check(var, name, default) {
-    if (var==undef) {
-        echo(str("Variable \"", name, "\" was not specified. Using default value ", default, "."));
-    }    
-}
 
 function _laserscad_stack() = str([for (i=[$parent_modules-1:-1:0]) parent_module(i)]);
 
