@@ -1,4 +1,4 @@
-# laserscad 0.3.1
+# laserscad 0.3.2
 
 A library for efficient lasercutting with OpenSCAD.
 
@@ -8,15 +8,16 @@ A library for efficient lasercutting with OpenSCAD.
 * Laser whichever shape you want
 * Model in 3D, then run one command to generate a 2D lasercutting template with all parts
 * Save time, because 2D parts are arranged automatically
-* *New in 0.2.0:* Add engravings to identify parts (or to make things look fancy)
+* Add engravings to identify parts (or to make things look fancy)
 
 ## Installation
 
 You will need:
-* A linux-based OS
-* ``openscad`` 2015.03, ``make``, ``python3`` installed
+* Debian/Ubuntu, Mac OS X or similar
+* ``openscad`` 2019.05, GNU ``make`` and ``python3`` installed
 
 To set up the library:
+* [Configure OpenSCAD for command line usage](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Using_OpenSCAD_in_a_command_line_environment)
 * [Download a release](https://github.com/mbugert/laserscad/releases) and unpack it to a destination of your choice
 * Move ``laserscad.scad`` from the ``dist`` folder into your [OpenSCAD library folder](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Libraries)
 
