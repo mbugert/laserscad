@@ -49,7 +49,7 @@ module _laserscad_var_sanity_check(undefined, name, default) {
 
 _laserscad_version_major = 0;
 _laserscad_version_minor = 3;
-_laserscad_version_patch = 0;
+_laserscad_version_patch = 2;
 
 // complains if major version mismatches or if minor version isn't high enough - minor version will be ignored if argument is negative
 module lassert_version(major=0, minor=-1) {

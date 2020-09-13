@@ -44,7 +44,7 @@ leg_z = 30;
 cube([top_x, top_y, thick]);
 ```
 
-We need to inform laserscad that our cube should be a lasered part. To do so, we wrap it with ``lpart()``, which takes two arguments: a unique string identifying the part and its dimensions on the x and y axes:
+We need to inform laserscad that our cube should be a lasered part. To do so, we wrap it with ``lpart()``, which takes two arguments: a *globally unique* string identifying this part and its dimensions on the x and y axes:
 
 ```
 lpart("table-top", [top_x, top_y]) {
@@ -65,7 +65,7 @@ Here's what it looks like in OpenSCAD now:
 
 ![Table top floating in the air](docs/tutorial_table_01.png)
 
-Our table will have two identically shaped legs, so let's create a module for both:
+Next, we create a reusable module with more complex geometry for the table legs. We will instantiate two instances of this model in a moment:
 
 ```
 module leg(id) {
@@ -82,7 +82,9 @@ module leg(id) {
 }
 ```
 
-Note how in this code snippet, ``lpart`` can contain an arbitrarily complex shape. Also, the leg is created lying in the xy-plane and is later rotated using ``lrotate``. This is necessary because laserscad requires lparts to lie in the xy-plane for lasercutting.
+There are two more things to point out on this code snippet:
+* The leg is created lying in the xy-plane and is later rotated using ``lrotate``. This is necessary because laserscad needs lparts to lie in the xy-plane for lasercutting. With ``lrotate`` we rotate the part for our 3D preview of the final object.
+* As mentioned earlier, the string identifier passed to each ``lpart`` call needs to be globally unique. We added an extra ``id`` parameter to the module and the ``lpart`` call so that we can create multiple table leg parts with unique identifiers.
 
 If we instantiate a leg with ``leg("left");`` it will look like this:
 
@@ -117,7 +119,7 @@ Children must be located in the first octant (in the positive x,y,z range). lase
 ``lpart(id, [x, y]) { ... }``
 
 #### Parameters
-* *id*: unique identifier string
+* *id*: identifier string, globally unique for each ``lpart`` call
 * *[x, y]*: x and y dimensions of the hull around the children
 
 ### ltranslate
