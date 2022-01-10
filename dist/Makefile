@@ -34,7 +34,8 @@ UTIL := util/
 ECHO = $(TEMP)$(SOURCE_NAME).echo
 BOUNDING_BOXES = $(TEMP)$(SOURCE_NAME)_bb.csv
 ARRANGEMENT = $(TEMP)$(SOURCE_NAME)_pos.csv
-CMDLINE_ARGS_FILE = $(TEMP)$(SOURCE_NAME)_cmdline_args.txt
+INJECT_CODE_FILE = $(TEMP)$(SOURCE_NAME)_inject_code.txt
+SOUCRE_WITH_INJECTED_CODE = $(TEMP)$(SOURCE_NAME)_injected.scad
 CUTTING_TEMPLATE = $(TARGET_DIR)$(SOURCE_NAME).dxf
 ENGRAVING_TEMPLATE = $(TARGET_DIR)$(SOURCE_NAME)_engrave.svg
 
@@ -74,24 +75,22 @@ $(ARRANGEMENT): $(BOUNDING_BOXES) | $(UTIL)
 	@python3 $(UTIL)column_packing.py $(sheet_xlen) $(sheet_ylen) $< $@
 
 # inject the optimal translations into the scad files
-$(CMDLINE_ARGS_FILE): $(ARRANGEMENT) | $(UTIL)
+$(INJECT_CODE_FILE): $(ARRANGEMENT) | $(UTIL)
 	@python3 $(UTIL)create_cmdline_args.py $< $@
+	sed '/^include .*laserscad.scad.*/r $(INJECT_CODE_FILE)' $(model) > $(SOUCRE_WITH_INJECTED_CODE)
 
 # export the engraving, then fix the unit in the SVG file
-$(ENGRAVING_TEMPLATE): $(SOURCE) $(CMDLINE_ARGS_FILE)
+$(ENGRAVING_TEMPLATE): $(SOURCE) $(INJECT_CODE_FILE)
 	@echo Exporting $@...
-	$(eval TRANSLATION_FUNC = $(shell cat $(CMDLINE_ARGS_FILE)))
-	@openscad -o $@ -D _laserscad_mode=3 -D '$(TRANSLATION_FUNC)' $(OFLAGS) $< 2> /dev/null
+	@openscad -o $@ -D _laserscad_mode=3 $(OFLAGS) $(SOUCRE_WITH_INJECTED_CODE) 2> /dev/null
 	@python3 $(UTIL)modify_svg.py $@ $(model_unit) $(engrave_stroke_width)
 	@echo Done.
 	
-$(CUTTING_TEMPLATE): $(SOURCE) $(CMDLINE_ARGS_FILE)
+$(CUTTING_TEMPLATE): $(SOURCE) $(INJECT_CODE_FILE)
 	@echo Exporting $@...
-	$(eval TRANSLATION_FUNC = $(shell cat $(CMDLINE_ARGS_FILE)))
-	@openscad -o $@ -D _laserscad_mode=4 -D '$(TRANSLATION_FUNC)' $(OFLAGS) $< 2> /dev/null
+	@openscad -o $@ -D _laserscad_mode=4 $(OFLAGS) $(SOUCRE_WITH_INJECTED_CODE) 2> /dev/null
 	@echo Done.
 
-_preview: $(SOURCE) $(CMDLINE_ARGS_FILE)
+_preview: $(SOURCE) $(INJECT_CODE_FILE)
 	@echo Opening preview of $(SOURCE)...
-	$(eval TRANSLATION_FUNC = $(shell cat $(CMDLINE_ARGS_FILE)))
-	@openscad -D _laserscad_mode=2 -D '$(TRANSLATION_FUNC)' $(OFLAGS) $<
+	@openscad -D _laserscad_mode=2 $(OFLAGS) $(SOUCRE_WITH_INJECTED_CODE)
